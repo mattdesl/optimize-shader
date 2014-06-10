@@ -26,7 +26,7 @@ Options:
   -d, --defines  define in KEY:value form, or a path to *.json file to include
 ```
 
-Pass the shader, flag whether it's vertex or fragment, and additional options. You can specify target GLSL language and a list of pre-processor `#define` statements to inject before optimizing. e.g.
+Pass the shader, flag whether it's vertex or fragment, and additional options. You can specify target GLSL language and a list of pre-processor `#define` statements to inject before optimizing. 
 
 ```
 # output to file

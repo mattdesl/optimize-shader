@@ -5,6 +5,8 @@ var argv = require('yargs')
         .demand(1)
         .describe('v', 'vertex shader')
         .describe('f', 'fragment shader')
+        .describe('p', 'source prefix, inserted after #version and optional defines')
+        .alias('p', 'prefix')
         .alias('t', 'target')
         .describe('t', 'the target: gl, es20, es30')
         .default('t', 'gl')
@@ -18,7 +20,7 @@ if (argv.v && argv.f) {
 
 var fs = require('fs');
 var path = require('path');
-var optimizer = require('../')
+var optimizer = require('../');
 var extend = require('xtend');
 
 var target = optimizer.TARGET_OPENGL;
@@ -38,7 +40,6 @@ else
 var defines = {};
 var defs = Array.isArray(argv.d) ? argv.d : [ argv.d ];
 
-
 for (var i=0; i<defs.length; i++) {
     var d = defs[i];
     if ( d && path.extname(d) === '.json' ) {
@@ -54,6 +55,10 @@ for (var i=0; i<defs.length; i++) {
     }
 }
 
+var srcPrefix;
+if (argv.p)
+    srcPrefix = fs.readFileSync(argv.p, 'utf8');
+
 var output = null;
 var file = argv._[0];
 var shader = fs.readFile( file, function(err, data) {
@@ -61,7 +66,8 @@ var shader = fs.readFile( file, function(err, data) {
         type: type,
         target: target,
         defines: defines,
-        source: data.toString()
+        source: data.toString(),
+        prefix: srcPrefix
     });
 
     if (optimized.compiled) {

@@ -42,21 +42,24 @@ function strDefines(source, defines) {
     return str;
 }
 
-function injectDefines(source, defines) {
+function injectFeatures(source, defines, sourcePrefix) {
     if (!defines)
         return source;
 
     var version = matchVersion(source);
     var defStr = strDefines(source, defines);
 
+    sourcePrefix = sourcePrefix||"";
+
     if (version.index !== -1 && version.length > 0) {
         var prefix = source.substring(0, version.index+version.length);
         var suffix = source.substring(version.index+version.length, source.length);
 
-        source = prefix + "\n" + defStr + "\n" + suffix;
-    } else {
-        source = defStr + "\n" + source;
-    }
+        source = prefix + "\n" + defStr + "\n" + sourcePrefix + "\n" + suffix;
+    } else if (sourcePrefix) { // try to minimize line # thrashing
+        source = defStr + '\n' + sourcePrefix + '\n' + source;
+    } else
+        source = defStr + '\n' + source;
     return source;
 }
 
@@ -70,7 +73,7 @@ function optimize(opts) {
         throw "type must be one of FRAGMENT_SHADER or VERTEX_SHADER";
     
     //Inject any optional defines...
-    source = injectDefines(source, opts.defines);
+    source = injectFeatures(source, opts.defines, opts.prefix);
 
     var compiler = new glslOptimizer.Compiler(target);
     var shader = new glslOptimizer.Shader(compiler, type, source);
