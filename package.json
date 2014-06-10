@@ -1,6 +1,6 @@
 {
   "name": "optimize-shader",
-  "version": "1.1.6",
+  "version": "1.2.0",
   "description": "a thin wrapper around glsl-optimizer",
   "main": "index.js",
   "license": "MIT",
