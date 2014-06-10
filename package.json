@@ -1,0 +1,60 @@
+{
+  "name": "optimize-shader",
+  "version": "1.1.6",
+  "description": "a thin wrapper around glsl-optimizer",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Matt DesLauriers <dave.des@gmail.com>",
+  "bin": {
+    "optimize-shader": "./bin/optimize-shader"
+  },
+  "dependencies": {
+    "glsl-optimizer": "git://github.com/mattdesl/glsl-optimizer#node-nan",
+    "yargs": "~1.2.2",
+    "glsl-tokenizer": "0.0.9",
+    "resumer": "0.0.0",
+    "xtend": "~3.0.0"
+  },
+  "devDependencies": {
+    "tape": "~2.13.2"
+  },
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "testling": {
+    "files": "test.js",
+    "browsers": [
+      "ie/6..latest",
+      "chrome/22..latest",
+      "firefox/16..latest",
+      "safari/latest",
+      "opera/11.0..latest",
+      "iphone/6",
+      "ipad/6",
+      "android-browser/latest"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mattdesl/optimize-shader.git"
+  },
+  "keywords": [
+    "glsl",
+    "glslify",
+    "webgl",
+    "opengl",
+    "shader",
+    "optimize",
+    "vertex",
+    "fragment",
+    "glsl-optimize",
+    "glsl-optimizer"
+  ],
+  "homepage": "https://github.com/mattdesl/optimize-shader",
+  "bugs": {
+    "url": "https://github.com/mattdesl/optimize-shader/issues"
+  },
+  "directories": {
+    "test": "test"
+  }
+}

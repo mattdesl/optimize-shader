@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+var argv = require('yargs')
+        .usage('Usage: optimize-shader shader.glsl -v|-f [-t es20 -d MAX_LIGHTS:3]')
+        .demand(1)
+        .describe('v', 'vertex shader')
+        .describe('f', 'fragment shader')
+        .alias('t', 'target')
+        .describe('t', 'the target: gl, es20, es30')
+        .default('t', 'gl')
+        .alias('d', 'defines')
+        .describe('d', 'define in KEY:value form, or a path to *.json file to include')
+        .argv;
+
+if (argv.v && argv.f) {
+    throw "shader can't be both fragment and vertex! choose one or the other";
+}
+
+var fs = require('fs');
+var path = require('path');
+var optimizer = require('../')
+var extend = require('xtend');
+
+var target = optimizer.TARGET_OPENGL;
+if (argv.t == 'es20')
+    target = optimizer.TARGET_OPENGLES20;
+else if (argv.t == 'es30')
+    target = optimizer.TARGET_OPENGLES30;
+
+var type;
+if (argv.v)
+    type = optimizer.VERTEX_SHADER;
+else if (argv.f)
+    type = optimizer.FRAGMENT_SHADER;
+else
+    throw "shader type must be -v or -f";
+
+var defines = {};
+var defs = Array.isArray(argv.d) ? argv.d : [ argv.d ];
+
+
+for (var i=0; i<defs.length; i++) {
+    var d = defs[i];
+    if ( d && path.extname(d) === '.json' ) {
+        defines = extend( defines, JSON.parse( fs.readFileSync(d, 'utf8') ) );
+    } else if (d) {
+        var spl = d.split(':', 2);
+
+        if (spl && spl.length > 0 && spl[0]) {
+            var obj = {};
+            obj[spl[0]] = spl[1]||"";
+            defines = extend( defines, obj );
+        }
+    }
+}
+
+var output = null;
+var file = argv._[0];
+var shader = fs.readFile( file, function(err, data) {
+    var optimized = optimizer({
+        type: type,
+        target: target,
+        defines: defines,
+        source: data.toString()
+    });
+
+    if (optimized.compiled) {
+        var writer = output ? fs.createWriteStream(output) : process.stdout;
+        writer.write((optimized.output||"").trim()+"\n");
+    } else {
+        throw new Error(file+" did not compile" +(optimized.log ? (": "+optimized.log):""));
+    }        
+});
